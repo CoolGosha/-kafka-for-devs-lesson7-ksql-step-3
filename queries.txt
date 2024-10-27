@@ -3,7 +3,7 @@ ksql> create table user_address_table (user_id varchar primary key, address_data
 
 ksql> create stream incoming_orders (id varchar, user_id varchar, ordered_items array<varchar>) with (kafka_topic='orders', value_format='avro');
 
-ksql> create stream order_delivery_2 with (kafka_topic='order_delivery_2', partitions=1, replicas=3, value_format='avro') as
+ksql> create stream order_delivery with (kafka_topic='order_delivery', partitions=1, replicas=3, value_format='avro') as
 >select
 >id as key,
 >as_value(id) as id,
