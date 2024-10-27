@@ -1,0 +1,15 @@
+ksql> create table user_address_table (user_id varchar primary key, address_data struct<line_1 varchar, line_2 varchar, zip varchar>)
+>with (kafka_topic='user_address', value_format='avro');
+
+ksql> create stream incoming_orders (id varchar, user_id varchar, ordered_items array<varchar>) with (kafka_topic='orders', value_format='avro');
+
+ksql> create stream order_delivery_2 with (kafka_topic='order_delivery_2', partitions=1, replicas=3, value_format='avro') as
+>select
+>id as key,
+>as_value(id) as id,
+>as_value(incoming_orders.user_id) as user_id,
+>ordered_items as items,
+>address_data->line_1 + ' ' + address_data->line_2 + ' ' + address_data->zip as address
+>from incoming_orders
+>join user_address_table on incoming_orders.user_id = user_address_table.user_id
+>partition by id;
